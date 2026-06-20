@@ -9,225 +9,258 @@
     <style>
         :root {
             --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0; --text: #0f172a; --text-muted: #475569;
-            --primary: #3b82f6; --success: #10b981; --danger: #ef4444; --radius: 12px;
+            --primary: #3b82f6; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --radius: 12px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); padding-bottom: 90px; font-size: 14px; }
-        header { background: var(--surface); padding: 12px 15px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; }
-        h1 { font-size: 1.1rem; font-weight: 800; }
-        .sync-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; font-weight: 700; background: #fee2e2; color: var(--danger); }
-        .sync-badge.connected { background: #dcfce7; color: var(--success); }
-        .search-bar { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 16px; background: #f1f5f9; }
-        .cats-bar { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        .cats-bar::-webkit-scrollbar { display: none; }
-        .cat-btn { padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); }
-        .cat-btn.active { background: var(--text); color: white; border-color: var(--text); }
-        .grid { padding: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-        .card { background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: var(--radius); display: flex; flex-direction: column; justify-content: space-between; min-height: 95px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .card:active { transform: scale(0.96); background: #f1f5f9; }
-        .card-name { font-weight: 700; font-size: 0.9rem; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .card-price { font-weight: 800; text-align: right; color: var(--primary); margin-top: 8px; font-size: 0.95rem; }
+        header { background: var(--surface); padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 40; }
+        .logo-area { display: flex; align-items: center; gap: 8px; }
+        .logo-dot { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; }
+        h1 { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; }
+        .status-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: #fee2e2; color: var(--danger); transition: all 0.3s; }
+        .status-badge.online { background: #d1fae5; color: var(--success); }
+        .status-dot { width: 6px; height: 6px; background: currentColor; border-radius: 50%; }
         
-        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--border); padding: 12px; display: flex; gap: 10px; align-items: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.06); z-index: 150; }
-        .btn { flex: 1; padding: 14px; border: none; border-radius: var(--radius); font-weight: 800; font-size: 1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .btn-cart { background: var(--text); color: white; }
-        .btn-send { background: var(--success); color: white; }
-        .btn-send:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
+        .setup-bar { background: var(--surface); padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; }
+        .input-group { flex: 1; position: relative; }
+        .input-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-weight: 600; outline: none; background: #f1f5f9; transition: all 0.2s; }
+        .input-group input:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
         
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; z-index: 200; }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--surface); width: 100%; max-height: 85%; border-radius: 20px 20px 0 0; padding: 20px; display: flex; flex-direction: column; animation: slideUp 0.2s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .input-tavolo { width: 100%; padding: 14px; border: 2px solid #fcd34d; border-radius: var(--radius); font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 15px; background: #fffbeb; color: #b45309; }
-        .cart-list { overflow-y: auto; flex: 1; list-style: none; padding-right: 5px; }
-        .cart-item { padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; }
-        .qta-controls { display: flex; align-items: center; gap: 10px; background: #f1f5f9; padding: 4px; border-radius: 8px; }
-        .btn-qta { width: 30px; height: 30px; background: white; border: 1px solid var(--border); border-radius: 6px; font-weight: 800; font-size: 16px; }
-        .note-input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #f8fafc; }
+        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 12px 15px; scrollbar-width: none; background: var(--bg); position: sticky; top: 115px; z-index: 30; }
+        .categories-scroll::-webkit-scrollbar { display: none; }
+        .cat-btn { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); whitespace: nowrap; cursor: pointer; transition: all 0.2s; }
+        .cat-btn.active { background: var(--text); color: var(--surface); border-color: var(--text); }
+        
+        .products-grid { padding: 0 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        .prod-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; min-height: 100px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: transform 0.1s; }
+        .prod-card:active { transform: scale(0.98); }
+        .prod-name { font-size: 13px; font-weight: 600; line-height: 1.3; margin-bottom: 8px; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .prod-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+        .prod-price { font-size: 14px; font-weight: 700; color: var(--primary); }
+        .badge-count { position: absolute; top: -6px; right: -6px; background: var(--primary); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 2px solid var(--surface); }
+
+        .fab-cart { position: fixed; bottom: 20px; right: 20px; left: 20px; background: var(--text); color: white; padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); z-index: 50; border: none; font-size: 15px; font-weight: 700; cursor: pointer; display: none; }
+        .fab-cart-left { display: flex; align-items: center; gap: 10px; }
+        .fab-badge { background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 8px; font-size: 12px; }
+        
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); display: flex; align-items: flex-end; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal.active { opacity: 1; pointer-events: auto; }
+        .modal-content { background: var(--surface); width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px; max-height: 85vh; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal.active .modal-content { transform: translateY(0); }
+        .modal-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 16px; font-weight: 700; }
+        .close-btn { background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .modal-body { padding: 15px; overflow-y: auto; flex: 1; }
+        
+        .cart-item { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .cart-item-row1 { display: flex; justify-content: space-between; align-items: flex-start; }
+        .cart-item-name { font-weight: 600; font-size: 14px; flex: 1; padding-right: 10px; }
+        .cart-item-actions { display: flex; align-items: center; gap: 12px; }
+        .btn-qta { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+        .item-qta { font-weight: 700; min-width: 15px; text-align: center; }
+        .cart-item-nota-input { width: 100%; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; margin-top: 4px; outline: none; }
+        
+        .modal-footer { padding: 15px; border-top: 1px solid var(--border); background: var(--bg); }
+        .btn-send { width: 100%; background: var(--success); color: white; border: none; padding: 14px; border-radius: var(--radius); font-size: 15px; font-weight: 700; box-shadow: 0 4px 12px rgba(16,185,129,0.2); }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="top-bar">
-            <h1>📝 Comande Ragazzi</h1>
-            <div id="status" class="sync-badge">Connessione...</div>
+        <div class="logo-area">
+            <div class="logo-dot"></div>
+            <h1>SmartCassa Palmare</h1>
         </div>
-        
-        <input type="hidden" id="sync-key" value="locale1">
-
-        <input type="text" id="search" class="search-bar" placeholder="🔍 Cerca piatto o bevanda..." oninput="filtraProdotti()">
-        <div class="cats-bar" id="cats-container"></div>
+        <div id="status" class="status-badge">
+            <div class="status-dot"></div>
+            <span id="status-text">OFFLINE</span>
+        </div>
     </header>
 
-    <div class="grid" id="menu-grid"></div>
-
-    <div class="cart-bar">
-        <button class="btn btn-cart" onclick="toggleCarrello()">🛒 Vedi Ordine (<span id="cart-count">0</span>)</button>
+    <div class="setup-bar">
+        <div class="input-group">
+            <input type="text" id="tavolo" placeholder="N° Tavolo / Nome" autocomplete="off" oninput="salvaStatoTemporaneo()">
+        </div>
+        <div class="input-group" style="flex: 1.2;">
+            <input type="text" id="chiave-rete" placeholder="Chiave Cassa (es: locale1)" value="locale1" autocomplete="off" onchange="connettiARete()">
+        </div>
     </div>
+
+    <div class="categories-scroll" id="categories-container"></div>
+    <div class="products-grid" id="products-container"></div>
+
+    <button class="fab-cart" id="fab-cart" onclick="toggleCarrello()">
+        <div class="fab-cart-left">
+            <span class="fab-badge" id="cart-count">0</span>
+            <span>Vedi Comanda</span>
+        </div>
+        <span id="cart-total">€ 0.00</span>
+    </button>
 
     <div class="modal" id="cart-modal" onclick="if(event.target===this) toggleCarrello()">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 style="font-weight:800;">Riepilogo Tavolo</h2>
-                <button onclick="toggleCarrello()" style="background: none; border: none; font-size: 1.6rem; font-weight: bold; padding: 5px;">✕</button>
+                <div class="modal-title">Riepilogo Comanda</div>
+                <button class="close-btn" onclick="toggleCarrello()">✕</button>
             </div>
-            <input type="text" id="tavolo" class="input-tavolo" placeholder="INSERISCI NUMERO TAVOLO" oninput="salvaStatoTemporaneo()">
-            
-            <ul class="cart-list" id="cart-items-list"></ul>
-            
-            <div style="padding: 15px 0; font-weight: 800; font-size: 1.2rem; display: flex; justify-content: space-between; border-top: 1px dashed var(--border); margin-top:10px;">
-                <span>Elementi ordinati:</span>
-                <span id="cart-total-items" style="color:var(--primary);">0</span>
+            <div class="modal-body" id="cart-items-container"></div>
+            <div class="modal-footer">
+                <button class="btn-send" onclick="inviaComandaInCassa()">🚀 INVIA IN CASSA</button>
             </div>
-            <button class="btn btn-send" id="btn-invia-cassa" style="width: 100%; padding: 16px; margin-top: 10px;" onclick="inviaOrdinazione()" disabled>🔥 INVIA SUBITO ALLA CASSA</button>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        //  INCOLLA QUI IL TUO MENU PRODOTTI (ESEMPIO)
-        // ==========================================
-        // Puoi sostituire questo array copiando l'elenco dal backup dello SmartCassa
+        // Database dei prodotti aggiornato richiesto
         let prodotti = [
-            { id: 1, nome: "Margherita", prezzo: 6.00, categoria: "PIZZE", icona: "🍕" },
-            { id: 2, nome: "Diavola", prezzo: 7.50, categoria: "PIZZE", icona: "🍕" },
-            { id: 3, nome: "Patatine Fritte", prezzo: 4.00, categoria: "SFIZI", icona: "🍟" },
-            { id: 4, nome: "Birra alla spina 0.4", prezzo: 5.00, categoria: "BEVANDE", icona: "🍺" },
-            { id: 5, nome: "Acqua Naturale", prezzo: 2.00, categoria: "BEVANDE", icona: "💧" },
-            { id: 6, nome: "Coca Cola in lattina", prezzo: 3.00, categoria: "BEVANDE", icona: "🥤" },
-            { id: 7, nome: "Caffè Espresso", prezzo: 1.20, categoria: "CAFFETTERIA", icona: "☕" }
+            { id: 1, categoria: "piadine", nome: "Piadina Crudo e Fontina", prezzo: 6.50, attivo: true },
+            { id: 2, categoria: "piadine", nome: "Piadina Cotto e Fontina", prezzo: 6.00, attivo: true },
+            { id: 3, categoria: "piadine", nome: "Piadina Salame e Fontina", prezzo: 6.00, attivo: true },
+            { id: 4, categoria: "piadine", nome: "Piadina Crudo", prezzo: 5.50, attivo: true },
+            { id: 5, categoria: "piadine", nome: "Piadina Cotto", prezzo: 5.00, attivo: true },
+            { id: 6, gateway: "piadine", nome: "Piadina Salame", prezzo: 5.00, attivo: true }, // corretto categoria implicita
+            { id: 7, categoria: "piadine", nome: "Piadina Salsiccia Cipolla e Peperoni", prezzo: 7.00, attivo: true },
+            { id: 8, categoria: "piadine", nome: "Piadina Stracchino e Rucola", prezzo: 5.50, attivo: true },
+            { id: 9, categoria: "piadine", nome: "Piadina Vuota", prezzo: 3.00, attivo: true },
+            { id: 10, categoria: "panini", nome: "Hamburger Classico", prezzo: 7.50, attivo: true },
+            { id: 11, categoria: "panini", nome: "Cheeseburger", prezzo: 8.00, attivo: true },
+            { id: 12, categoria: "panini", nome: "Hot Dog", prezzo: 4.50, attivo: true },
+            { id: 13, categoria: "piatti", nome: "Cotoletta e Patatine", prezzo: 9.00, attivo: true },
+            { id: 14, categoria: "piatti", nome: "Porzione Patatine Fritte", prezzo: 4.00, attivo: true },
+            { id: 15, categoria: "piatti", nome: "Insalatona sfiziosa", prezzo: 7.50, attivo: true },
+            { id: 16, categoria: "bevande", nome: "Acqua Naturale 50cl", prezzo: 1.50, attivo: true },
+            { id: 17, categoria: "bevande", nome: "Acqua Frizzante 50cl", prezzo: 1.50, attivo: true },
+            { id: 18, categoria: "bevande", nome: "Coca Cola in lattina", prezzo: 2.50, attivo: true },
+            { id: 19, categoria: "bevande", nome: "Fanta / Estathé", prezzo: 2.50, attivo: true },
+            { id: 20, categoria: "bevande", nome: "Birra alla Spina 40cl", prezzo: 4.50, attivo: true },
+            { id: 21, categoria: "bevande", nome: "Birra in Bottiglia", prezzo: 3.50, attivo: true },
+            { id: 25, categoria: "caffetteria", nome: "Caffè Espresso", prezzo: 1.20, attivo: true },
+            { id: 26, categoria: "caffetteria", nome: "Caffè Corretto", prezzo: 2.00, attivo: true },
+            { id: 27, categoria: "caffetteria", nome: "Amaro del Capo", prezzo: 3.00, attivo: true },
+            { id: 22, categoria: "cocktail", nome: "Aperol Spritz", prezzo: 5.00, attivo: true },
+            { id: 23, categoria: "cocktail", nome: "Mojito", prezzo: 6.00, attivo: true },
+            { id: 24, categoria: "cocktail", nome: "Gin Tonic", prezzo: 7.00, attivo: true }
         ];
 
+        // Sistemazione campo fallito nell'oggetto id 6
+        prodotti.forEach(p => { if(!p.categoria && p.gateway) p.categoria = p.gateway; });
+
         let carrello = [];
-        let filtroCategoria = 'TUTTI';
-        let clientMqtt = null;
-
-        function connettiARete() {
-            const key = document.getElementById('sync-key').value.trim();
-            
-            // Server Broker Cloud sicuro basato su WebSocket HTTPS
-            clientMqtt = mqtt.connect('wss://broker.hivemq.com:8000/mqtt');
-
-            clientMqtt.on('connect', () => {
-                document.getElementById('status').innerText = "Online";
-                document.getElementById('status').className = "sync-badge connected";
-                document.getElementById('btn-invia-cassa').disabled = false;
-            });
-
-            clientMqtt.on('close', () => {
-                document.getElementById('status').innerText = "Disconnesso";
-                document.getElementById('status').className = "sync-badge";
-                document.getElementById('btn-invia-cassa').disabled = true;
-            });
-        }
+        let categoriaSelezionata = "tutti";
+        let clientCassa = null; // Variabile client aggiornata
 
         function generaInterfaccia() {
-            const categorie = ['TUTTI', ...new Set(prodotti.map(p => p.categoria))];
-            const catsCont = document.getElementById('cats-container');
-            catsCont.innerHTML = categorie.map(c => `
-                <button class="cat-btn ${c === filtroCategoria ? 'active' : ''}" onclick="setCategoria('${c}')">${c}</button>
+            const categorie = ["tutti", ...new Set(prodotti.map(p => p.categoria))];
+            const catContainer = document.getElementById('categories-container');
+            catContainer.innerHTML = categorie.map(cat => `
+                <button class="cat-btn ${cat === categoriaSelezionata ? 'active' : ''}" onclick="cambiaCategoria('${cat}')">
+                    ${cat.toUpperCase()}
+                </button>
             `).join('');
             filtraProdotti();
         }
 
-        function setCategoria(cat) {
-            filtroCategoria = cat;
-            generaInterfaccia();
+        function cambiaCategoria(cat) {
+            categoriaSelezionata = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText.toLowerCase() === cat.toLowerCase());
+            });
+            filtraProdotti();
         }
 
         function filtraProdotti() {
-            const query = document.getElementById('search').value.toLowerCase();
-            const grid = document.getElementById('menu-grid');
-            grid.innerHTML = '';
-
-            const filtrati = prodotti.filter(p => {
-                const matchCat = filtroCategoria === 'TUTTI' || p.categoria === filtroCategoria;
-                const matchQuery = p.nome.toLowerCase().includes(query);
-                return matchCat && matchQuery;
-            });
-
-            filtrati.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => aggiungiAlCarrello(p);
-                card.innerHTML = `
-                    <div class="card-name">${p.icona || '🍔'} ${p.nome}</div>
-                    <div class="card-price">${parseFloat(p.prezzo).toFixed(2)} €</div>
+            const container = document.getElementById('products-container');
+            const filtrati = categoriaSelezionata === "tutti" ? prodotti : prodotti.filter(p => p.categoria === categoriaSelezionata);
+            
+            container.innerHTML = filtrati.map(p => {
+                const nelCarrello = carrello.find(item => item.id === p.id);
+                const qta = nelCarrello ? nelCarrello.qta : 0;
+                return `
+                    <div class="prod-card" onclick="aggiungiAlCarrello(${p.id})">
+                        ${qta > 0 ? `<div class="badge-count">${qta}</div>` : ''}
+                        <div class="prod-name">${p.nome}</div>
+                        <div class="prod-footer">
+                            <div class="prod-price">€ ${p.prezzo.toFixed(2)}</div>
+                        </div>
+                    </div>
                 `;
-                grid.appendChild(card);
-            });
+            }).join('');
         }
 
-        function aggiungiAlCarrello(prodotto) {
-            const esistente = carrello.find(item => item.id === producto.id && !item.nota);
-            if (esistente) {
+        function aggiungiAlCarrello(id) {
+            const prod = prodotti.find(p => p.id === id);
+            const esistente = carrello.find(item => item.id === id);
+            if(esistente) {
                 esistente.qta++;
             } else {
-                carrello.push({ ...prodotto, qta: 1, nota: '' });
+                carrello.push({ ...prod, qta: 1, nota: "" });
             }
             salvaStatoTemporaneo();
             aggiornaCarrelloBar();
-            
-            let b = document.getElementById('cart-count');
-            b.style.transform = 'scale(1.2)';
-            setTimeout(() => b.style.transform = 'none', 100);
+            filtraProdotti();
+        }
+
+        function modificaQta(id, variaz) {
+            const esistente = carrello.find(item => item.id === id);
+            if(esistente) {
+                esistente.qta += variaz;
+                if(esistente.qta <= 0) {
+                    carrello = carrello.filter(item => item.id !== id);
+                }
+            }
+            salvaStatoTemporaneo();
+            aggiornaCarrelloBar();
+            filtraProdotti();
+            renderizzaElementiCarrello();
+        }
+
+        function aggiornaNota(id, testo) {
+            const esistente = carrello.find(item => item.id === id);
+            if(esistente) esistente.nota = testo;
+            salvaStatoTemporaneo();
         }
 
         function aggiornaCarrelloBar() {
-            const count = carrello.reduce((acc, item) => acc + item.qta, 0);
-            document.getElementById('cart-count').innerText = count;
+            const fab = document.getElementById('fab-cart');
+            if(carrello.length === 0) {
+                fab.style.display = 'none';
+                return;
+            }
+            fab.style.display = 'flex';
+            const totalePezzi = carrello.reduce((acc, item) => acc + item.qta, 0);
+            const importoTotale = carrello.reduce((acc, item) => acc + (item.prezzo * item.qta), 0);
+            
+            document.getElementById('cart-count').innerText = totalePezzi;
+            document.getElementById('cart-total').innerText = "€ " + importoTotale.toFixed(2);
         }
 
         function toggleCarrello() {
-            const m = document.getElementById('cart-modal');
-            m.classList.toggle('active');
-            if(m.classList.contains('active')) renderCarrelloDettaglio();
+            const modal = document.getElementById('cart-modal');
+            modal.classList.toggle('active');
+            if(modal.classList.contains('active')) {
+                renderizzaElementiCarrello();
+            }
         }
 
-        function cambiaQta(index, delta) {
-            carrello[index].qta += delta;
-            if(carrello[index].qta <= 0) carrello.splice(index, 1);
-            salvaStatoTemporaneo();
-            renderCarrelloDettaglio();
-            aggiornaCarrelloBar();
-        }
-
-        function aggiornaNota(index, valore) {
-            carrello[index].nota = valore;
-            salvaStatoTemporaneo();
-        }
-
-        function renderCarrelloDettaglio() {
-            const list = document.getElementById('cart-items-list');
-            list.innerHTML = '';
-            let qtaTotale = 0;
-
-            carrello.forEach((item, index) => {
-                qtaTotale += item.qta;
-                const li = document.createElement('li');
-                li.className = 'cart-item';
-                li.innerHTML = `
-                    <div class="cart-item-row">
-                        <div>
-                            <strong>${item.nome}</strong><br>
-                            <span style="color:var(--text-muted); font-size:0.85rem;">${parseFloat(item.prezzo).toFixed(2)} €</span>
-                        </div>
-                        <div class="qta-controls">
-                            <button class="btn-qta" onclick="cambiaQta(${index}, -1)">-</button>
-                            <span style="font-weight:800; width:20px; text-align:center;">${item.qta}</span>
-                            <button class="btn-qta" onclick="cambiaQta(${index}, 1)">+</button>
+        function renderizzaElementiCarrello() {
+            const container = document.getElementById('cart-items-container');
+            if(carrello.length === 0) {
+                container.innerHTML = "<p style='text-align:center;color:var(--text-muted);padding:20px;'>La comanda è vuota</p>";
+                return;
+            }
+            container.innerHTML = carrello.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-row1">
+                        <div class="cart-item-name">${item.nome}</div>
+                        <div class="cart-item-actions">
+                            <button class="btn-qta" onclick="modificaQta(${item.id}, -1)">-</button>
+                            <span class="item-qta">${item.qta}</span>
+                            <button class="btn-qta" onclick="modificaQta(${item.id}, 1)">+</button>
                         </div>
                     </div>
-                    <input type="text" class="note-input" placeholder="Note (es. ben cotta, senza ghiaccio...)" value="${item.nota || ''}" oninput="aggiornaNota(${index}, this.value)">
-                `;
-                list.appendChild(li);
-            });
-
-            document.getElementById('cart-total-items').innerText = qtaTotale;
+                    <input type="text" class="cart-item-nota-input" placeholder="Aggiungi una nota (es: senza cipolla)..." value="${item.nota}" oninput="aggiornaNota(${item.id}, this.value)">
+                </div>
+            `).join('');
         }
 
         function salvaStatoTemporaneo() {
@@ -235,14 +268,54 @@
             localStorage.setItem('palmare_tavolo_temp', document.getElementById('tavolo').value);
         }
 
-        function inviaOrdinazione() {
-            const tavolo = document.getElementById('tavolo').value.trim();
-            if(!tavolo) { alert("Attenzione: Inserisci il numero del tavolo!"); return; }
-            if(carrello.length === 0) { alert("L'ordine è vuoto!"); return; }
-            if(!clientMqtt || !clientMqtt.connected) { alert("Impossibile inviare: il telefono è offline!"); return; }
-
-            const key = document.getElementById('sync-key').value.trim();
+        // Funzione di connessione aggiornata al broker HiveMQ WSS richiesto
+        function connettiARete() {
+            const statusBadge = document.getElementById('status');
+            const statusText = document.getElementById('status-text');
             
+            if(clientCassa) {
+                clientCassa.end();
+            }
+
+            statusText.innerText = "CONNESSIONE...";
+            statusBadge.style.color = "var(--warning)";
+            statusBadge.style.background = "#fef3c7";
+
+            // Inizializzazione clientCassa con i parametri forniti
+            clientCassa = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
+
+            clientCassa.on('connect', () => {
+                statusText.innerText = "ONLINE";
+                statusBadge.className = "status-badge online";
+            });
+
+            clientCassa.on('error', () => {
+                statusText.innerText = "ERRORE";
+                statusBadge.className = "status-badge";
+            });
+
+            clientCassa.on('close', () => {
+                statusText.innerText = "OFFLINE";
+                statusBadge.className = "status-badge";
+            });
+        }
+
+        function inviaComandaInCassa() {
+            const tavolo = document.getElementById('tavolo').value.trim();
+            const key = document.getElementById('chiave-rete').value.trim();
+
+            if(!tavolo) {
+                alert("⚠️ Inserisci il numero del tavolo o il nome del cliente prima di inviare!");
+                if(document.getElementById('cart-modal').classList.contains('active')) toggleCarrello();
+                document.getElementById('tavolo').focus();
+                return;
+            }
+
+            if(!clientCassa || !clientCassa.connected) {
+                alert("❌ Il palmare non è connesso alla rete MQTT. Controlla la connessione.");
+                return;
+            }
+
             const pacchettoComanda = {
                 tavolo: tavolo,
                 elementi: carrello.map(item => ({
@@ -255,13 +328,15 @@
                 timestamp: Date.now()
             };
 
-            clientMqtt.publish(`smartcassa/comande/${key}`, JSON.stringify(pacchettoComanda), { qos: 1 }, (err) => {
+            // Invio della comanda sul topic condiviso con la Cassa principale
+            clientCassa.publish(`smartcassa/comande/${key}`, JSON.stringify(pacchettoComanda), { qos: 1 }, (err) => {
                 if(!err) {
                     alert("🚀 Comanda del Tavolo " + tavolo + " inviata in cassa!");
                     carrello = [];
                     document.getElementById('tavolo').value = '';
                     salvaStatoTemporaneo();
                     aggiornaCarrelloBar();
+                    filtraProdotti();
                     if(document.getElementById('cart-modal').classList.contains('active')) toggleCarrello();
                 } else {
                     alert("Errore di trasmissione, riprova.");
@@ -270,7 +345,6 @@
         }
 
         window.onload = () => {
-            // Recupera lo stato se la pagina viene rinfrescata per sbaglio
             const savedCart = localStorage.getItem('palmare_cart_temp');
             const savedTavolo = localStorage.getItem('palmare_tavolo_temp');
             if(savedCart) carrello = JSON.parse(savedCart);
