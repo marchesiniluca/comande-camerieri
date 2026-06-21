@@ -38,7 +38,7 @@
             --radius-md: 10px;
             --radius-sm: 6px;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         body.dark-mode {
@@ -54,82 +54,97 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: -0.01em; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
 
-        header { background: var(--surface); padding: 0.6rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
+        header { background: var(--surface); padding: 0.6rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; transition: background-color 0.3s, border-color 0.3s; }
+        .brand { display: flex; align-items: center; gap: 6px; }
         .brand h1 { font-size: 1rem; font-weight: 800; }
-        .brand span { background: var(--warning-dim); color: var(--warning); padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); font-size: 0.6rem; font-weight: 700; margin-left: 0.3rem; }
+        .brand span { background: var(--warning-dim); color: var(--warning); padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); font-size: 0.6rem; font-weight: 700; }
         
-        .stato-rete { font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 20px; background: var(--border); color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+        .header-tools { display: flex; align-items: center; gap: 8px; }
+        .theme-btn { background: var(--border); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; color: var(--text-main); }
+        .stato-rete { font-size: 0.7rem; font-weight: 700; padding: 0.35rem 0.6rem; border-radius: 20px; background: var(--border); color: var(--text-muted); display: flex; align-items: center; gap: 4px; transition: background-color 0.3s; }
         .stato-rete.online { background: var(--success-dim); color: var(--success); }
         .stato-rete .pallino { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
         .main-layout { display: flex; flex-direction: column; flex: 1; padding-bottom: 75px; }
         
-        /* Sezione Configurazione Iniziale Rete */
+        /* Config e Input Alto */
         .config-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.5rem 1rem; display: flex; gap: 0.5rem; align-items: center; }
         .config-bar input { flex: 1; padding: 0.4rem 0.6rem; font-size: 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--input-bg); color: var(--text-main); font-weight: 600; text-align: center; }
 
-        /* Tavolo e Ricerca */
         .top-inputs { padding: 0.75rem 1rem; background: var(--surface); display: flex; flex-direction: column; gap: 0.5rem; border-bottom: 1px solid var(--border); }
-        .input-tavolo { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 16px; font-weight: 700; background: var(--input-bg); color: var(--text-main); text-align: center; }
+        .input-tavolo { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 16px; font-weight: 700; background: var(--input-bg); color: var(--text-main); text-align: center; text-transform: uppercase; }
         .input-tavolo:focus { outline: none; border-color: var(--primary); }
+        .search-bar { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem; background: var(--bg-main); color: var(--text-main); }
+        .search-bar:focus { outline: none; border-color: var(--primary); }
 
-        /* Categorie a scorrimento orizzontale fisso per smartphone */
-        .barra-filtri-banco { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.5rem 1rem; background: var(--bg-main); border-bottom: 1px solid var(--border); white-space: nowrap; }
+        /* Filtri Categorie */
+        .barra-filtri-banco { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.6rem 1rem; background: var(--bg-main); border-bottom: 1px solid var(--border); white-space: nowrap; }
         .barra-filtri-banco::-webkit-scrollbar { display: none; }
-        .tab-filtro { padding: 0.5rem 0.9rem; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; display: inline-block; }
+        .tab-filtro { padding: 0.5rem 0.9rem; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700; color: var(--text-muted); cursor: pointer; display: inline-block; transition: all 0.2s; }
         .tab-filtro.active { background: var(--text-main); color: var(--surface); border-color: var(--text-main); }
 
-        /* Lista prodotti compatta */
-        .grid-prodotti { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; padding: 1rem; }
-        .card-prodotto { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.75rem; display: flex; flex-direction: column; justify-content: space-between; background: var(--surface); min-height: 90px; position: relative; user-select: none; }
-        .card-prodotto:active { background: var(--border); transform: scale(0.96); }
-        .card-icon { font-size: 1.2rem; margin-bottom: 0.2rem; }
-        .nome-prodotto { font-weight: 700; font-size: 0.8rem; line-height: 1.2; color: var(--text-main); }
-        .prezzo-prodotto { font-weight: 800; font-size: 0.88rem; color: var(--text-main); text-align: right; margin-top: auto; }
+        /* Prodotti */
+        .grid-prodotti { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.6rem; padding: 1rem; }
+        .card-prodotto { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.8rem; display: flex; flex-direction: column; justify-content: space-between; background: var(--surface); min-height: 95px; position: relative; user-select: none; transition: transform 0.1s, box-shadow 0.1s; }
+        .card-prodotto:active { transform: scale(0.95); background: var(--input-bg); }
+        .card-icon { font-size: 1.4rem; margin-bottom: 0.3rem; }
+        .nome-prodotto { font-weight: 700; font-size: 0.82rem; line-height: 1.25; color: var(--text-main); }
+        .prezzo-prodotto { font-weight: 800; font-size: 0.9rem; color: var(--text-main); text-align: right; margin-top: auto; padding-top: 5px; }
+        
+        /* Badge Quantità Card */
+        .badge-qta { position: absolute; top: -6px; right: -6px; background: var(--primary); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: pop 0.2s ease-out; }
+        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
-        /* Bottom bar fissa per vedere la comanda sul telefono */
-        .mobile-cassa-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--border); z-index: 101; box-shadow: 0 -4px 12px rgba(0,0,0,0.08); display: flex; }
-        .mobile-sub-btn { flex: 1; padding: 1rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .mobile-sub-btn.active { color: var(--primary); background: var(--input-bg); border-top: 3px solid var(--primary); }
-
-        /* Vista Carrello/Comanda attiva a schermo intero sul telefono */
+        /* Vista Comanda */
         .comanda-screen { display: none; padding: 1rem; flex-direction: column; flex: 1; background: var(--surface); }
         .comanda-screen.active { display: flex; }
+        .header-comanda { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border); }
+        .btn-svuota { background: var(--danger-dim); color: var(--danger); border: none; padding: 0.4rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 700; }
+        
         .lista-comanda { list-style: none; overflow-y: auto; flex: 1; margin-bottom: 1rem; }
         .comanda-vuota-stato { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-light); font-size: 0.85rem; padding: 4rem 1rem; text-align: center; gap: 0.5rem; }
         
         .item-comanda { display: flex; flex-direction: column; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
         .item-riga-alta { display: flex; justify-content: space-between; align-items: center; }
-        .info-articolo-nome { font-weight: 600; font-size: 0.85rem; }
+        .info-articolo-nome { font-weight: 600; font-size: 0.88rem; }
         .info-articolo-nome strong { color: var(--primary); margin-right: 0.3rem; }
+        .item-prezzo { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); margin-right: 0.5rem; }
         
         .controlli-qta { display: flex; align-items: center; gap: 0.4rem; background: var(--bg-main); padding: 0.2rem; border-radius: var(--radius-sm); border: 1px solid var(--border); }
-        .btn-modifica { background: var(--surface); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: var(--radius-sm); font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; color: var(--text-main); }
+        .btn-modifica { background: var(--surface); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: var(--radius-sm); font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; color: var(--text-main); transition: background 0.1s; }
+        .btn-modifica:active { background: var(--border); }
 
-        .nota-variazione { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; margin-top: 0.4rem; background: var(--input-bg); padding: 0.35rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border); width: fit-content; }
+        .nota-variazione { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; margin-top: 0.4rem; background: var(--input-bg); padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border); width: fit-content; display: inline-flex; align-items: center; gap: 4px; }
 
         .totale-box-mobile { padding: 1rem 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
         .totale-box-mobile span { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); }
-        .totale-box-mobile .prezzo { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
+        .totale-box-mobile .prezzo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
 
-        .btn-invia-comanda { width: 100%; border: none; padding: 0.85rem; border-radius: var(--radius-md); font-size: 1rem; font-weight: 700; background: var(--success); color: white; display: flex; justify-content: center; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-md); }
-        .btn-invia-comanda:disabled { opacity: 0.4; }
+        .btn-invia-comanda { width: 100%; border: none; padding: 0.9rem; border-radius: var(--radius-md); font-size: 1rem; font-weight: 700; background: var(--success); color: white; display: flex; justify-content: center; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-md); transition: opacity 0.2s, transform 0.1s; }
+        .btn-invia-comanda:active:not(:disabled) { transform: translateY(2px); }
+        .btn-invia-comanda:disabled { opacity: 0.5; }
 
-        /* Modale per le Note */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        /* Bottom Bar */
+        .mobile-cassa-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--border); z-index: 101; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); display: flex; transition: background-color 0.3s; }
+        .mobile-sub-btn { flex: 1; padding: 1rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: color 0.2s, background-color 0.2s; }
+        .mobile-sub-btn.active { color: var(--primary); background: var(--info-dim); border-top: 3px solid var(--primary); }
+
+        /* Modale */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
-        .modal-box { background: var(--surface); padding: 1.25rem; border-radius: var(--radius-lg); width: 90%; max-width: 340px; border: 1px solid var(--border); }
-        .modal-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .modal-box input { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 16px; margin-bottom: 1rem; background: var(--input-bg); color: var(--text-main); }
+        .modal-box { background: var(--surface); padding: 1.25rem; border-radius: var(--radius-lg); width: 90%; max-width: 340px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .modal-box h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem; }
+        .modal-box input { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 16px; margin-bottom: 1rem; background: var(--input-bg); color: var(--text-main); }
         .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
-        .btn-modal { padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.85rem; border: none; }
+        .btn-modal { padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.85rem; border: none; }
         .btn-modal.cancel { background: var(--bg-main); color: var(--text-muted); }
         .btn-modal.confirm { background: var(--text-main); color: var(--surface); }
 
         #toast-container { position: fixed; top: 12px; left: 12px; right: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
-        .toast { padding: 0.75rem 1rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; color: white; background: #0f172a; text-align: center; box-shadow: var(--shadow-md); }
+        .toast { padding: 0.85rem 1rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; color: white; background: #0f172a; text-align: center; box-shadow: var(--shadow-md); animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         #view-prodotti-container { display: flex; flex-direction: column; flex: 1; }
         #view-prodotti-container.hidden { display: none; }
@@ -143,13 +158,16 @@
         <div class="brand">
             <h1>SmartCassa <span>PALMARE</span></h1>
         </div>
-        <div class="stato-rete" id="rete-status">
-            <span class="pallino"></span> <span id="rete-testo">Disconnesso</span>
+        <div class="header-tools">
+            <button class="theme-btn" onclick="toggleTheme()" title="Tema Scuro">🌓</button>
+            <div class="stato-rete" id="rete-status">
+                <span class="pallino"></span> <span id="rete-testo">Disconnesso</span>
+            </div>
         </div>
     </header>
 
     <div class="config-bar">
-        <span style="font-size:0.7rem; font-weight:800; color:var(--text-muted);">STANZA RETE:</span>
+        <span style="font-size:0.7rem; font-weight:800; color:var(--text-muted);">RETE:</span>
         <input type="text" id="chiave-rete-id" value="Cassa_MioHotspot" onchange="connettiMqttRete()">
     </div>
 
@@ -157,7 +175,8 @@
         
         <div id="view-prodotti-container">
             <div class="top-inputs">
-                <input type="text" id="num-tavolo-palmare" class="input-tavolo" placeholder="INSERISCI TAVOLO / NOME" autocomplete="off">
+                <input type="text" id="num-tavolo-palmare" class="input-tavolo" placeholder="TAVOLO / NOME" autocomplete="off">
+                <input type="text" id="search-prodotti" class="search-bar" placeholder="🔍 Cerca prodotto..." oninput="ricercaProdotti()">
             </div>
 
             <div class="barra-filtri-banco" id="tabs-banco-palmare"></div>
@@ -166,6 +185,11 @@
         </div>
 
         <div id="view-comanda-container" class="comanda-screen">
+            <div class="header-comanda">
+                <span style="font-weight:800; font-size:1.1rem;">Riepilogo Ordine</span>
+                <button class="btn-svuota" onclick="svuotaComanda()">🗑️ Svuota</button>
+            </div>
+            
             <ul class="lista-comanda" id="corpo-comanda-palmare"></ul>
 
             <div class="totale-box-mobile">
@@ -173,14 +197,18 @@
                 <span class="prezzo" id="totale-comanda-palmare">0,00 €</span>
             </div>
 
-            <button class="btn-invia-comanda" id="btn-invia-cassa" onclick="spedisciOrdineACassa()" disabled>📡 Invia Comanda alla Cassa</button>
+            <button class="btn-invia-comanda" id="btn-invia-cassa" onclick="spedisciOrdineACassa()" disabled>
+                📡 INVIA ALLA CASSA
+            </button>
         </div>
 
     </div>
 
     <div class="mobile-cassa-bar">
         <button id="btn-nav-prod" class="mobile-sub-btn active" onclick="switchSchermataMobile('menu')">🍽️ Prodotti</button>
-        <button id="btn-nav-com" class="mobile-sub-btn" onclick="switchSchermataMobile('comanda')">🛒 Vedi Ordine (<span id="badge-totale-palmare">0,00 €</span>)</button>
+        <button id="btn-nav-com" class="mobile-sub-btn" onclick="switchSchermataMobile('comanda')">
+            🛒 Ordine <span id="badge-totale-palmare" style="background:var(--danger); color:white; padding:2px 6px; border-radius:10px; font-size:0.7rem; margin-left:4px;">0</span>
+        </button>
     </div>
 
     <div class="modal-overlay" id="modal-nota-palmare">
@@ -189,13 +217,13 @@
             <input type="text" id="input-nota-palmare" placeholder="Es: Senza cipolla, Ben cotto..." autocomplete="off">
             <div class="modal-actions">
                 <button class="btn-modal cancel" onclick="chiudiModalNotaPalmare()">Annulla</button>
-                <button class="btn-modal confirm" onclick="salvaModalNotaPalmare()">Salva</button>
+                <button class="btn-modal confirm" onclick="salvaModalNotaPalmare()">Salva Nota</button>
             </div>
         </div>
     </div>
 
     <script>
-        // DATI IDENTICI E SINCRONIZZATI AL 100% CON IL TUO FILE DI PARTENZA
+        // DATI SINCRONIZZATI CON LA TUA CASSA
         const elencoCategorie = ["piadine", "panini", "piatti", "bevande", "caffetteria", "cocktail"];
         
         const databaseMenu = [
@@ -234,11 +262,21 @@
         let categoriaSelezionata = "piadine";
         let indexNotaAttiva = null;
         let clientMqtt = null;
+        let termineRicerca = "";
 
         const formattaEuro = (val) => new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(val);
 
-        // Controllo della navigazione per lo schermo dello smartphone
+        function triggerVibration() {
+            if (navigator.vibrate) navigator.vibrate(30);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            triggerVibration();
+        }
+
         function switchSchermataMobile(vista) {
+            triggerVibration();
             const vp = document.getElementById('view-prodotti-container');
             const vc = document.getElementById('view-comanda-container');
             const btnP = document.getElementById('btn-nav-prod');
@@ -247,6 +285,7 @@
             if(vista === 'menu') {
                 vp.classList.remove('hidden'); vc.classList.remove('active');
                 btnP.classList.add('active'); btnC.classList.remove('active');
+                disegnaGrigliaProdotti(); // Aggiorna badge quantità
             } else {
                 vp.classList.add('hidden'); vc.classList.add('active');
                 btnC.classList.add('active'); btnP.classList.remove('active');
@@ -264,25 +303,48 @@
         }
 
         function cambiaCategoria(cat) {
+            triggerVibration();
             categoriaSelezionata = cat;
+            termineRicerca = "";
+            document.getElementById('search-prodotti').value = "";
             disegnaTabsFiltri();
             disegnaGrigliaProdotti();
         }
 
+        function ricercaProdotti() {
+            termineRicerca = document.getElementById('search-prodotti').value.toLowerCase();
+            disegnaGrigliaProdotti();
+        }
+
+        function ottieniQuantitaInComanda(id) {
+            return comandaPalmare.filter(item => item.id === id).reduce((acc, curr) => acc + curr.quantita, 0);
+        }
+
         function disegnaGrigliaProdotti() {
             const grid = document.getElementById('griglia-prodotti-palmare');
-            const filtrati = databaseMenu.filter(p => p.categoria === categoriaSelezionata);
             
-            grid.innerHTML = filtrati.map(p => `
-                <div class="card-prodotto" onclick="aggiungiProdotto(${p.id})">
-                    <span class="card-icon">${emojiMappa[p.categoria] || '🍽️'}</span>
-                    <div class="nome-prodotto">${p.nome}</div>
-                    <div class="prezzo-prodotto">${formattaEuro(p.prezzo)}</div>
-                </div>
-            `).join('');
+            const filtrati = databaseMenu.filter(p => {
+                if (termineRicerca) return p.nome.toLowerCase().includes(termineRicerca);
+                return p.categoria === categoriaSelezionata;
+            });
+            
+            grid.innerHTML = filtrati.map(p => {
+                const qta = ottieniQuantitaInComanda(p.id);
+                const badge = qta > 0 ? `<div class="badge-qta">${qta}</div>` : '';
+                
+                return `
+                    <div class="card-prodotto" onclick="aggiungiProdotto(${p.id})">
+                        ${badge}
+                        <span class="card-icon">${emojiMappa[p.categoria] || '🍽️'}</span>
+                        <div class="nome-prodotto">${p.nome}</div>
+                        <div class="prezzo-prodotto">${formattaEuro(p.prezzo)}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function aggiungiProdotto(id) {
+            triggerVibration();
             const p = databaseMenu.find(m => m.id === id);
             if(!p) return;
             
@@ -293,17 +355,34 @@
                 comandaPalmare.push({ id: p.id, nome: p.nome, prezzo: p.prezzo, quantita: 1, variazione: "" });
             }
             
-            let totale = comandaPalmare.reduce((acc, curr) => acc + (curr.prezzo * curr.quantita), 0);
-            document.getElementById('badge-totale-palmare').innerText = formattaEuro(totale);
-            showToast(`Aggiunto x1 ${p.nome}`);
+            disegnaGrigliaProdotti(); // Aggiorna il badge sulla card
+            aggiornaBadgeNavigazione();
+            showToast(`Aggiunto: ${p.nome}`);
         }
 
         function cambiaQuantitaItem(idx, variaz) {
+            triggerVibration();
             comandaPalmare[idx].quantita += variaz;
             if(comandaPalmare[idx].quantita <= 0) {
                 comandaPalmare.splice(idx, 1);
             }
             aggiornaInterfacciaComandaPalmare();
+        }
+
+        function svuotaComanda() {
+            if(confirm("Sei sicuro di voler svuotare l'intero ordine?")) {
+                comandaPalmare = [];
+                aggiornaInterfacciaComandaPalmare();
+                disegnaGrigliaProdotti();
+                showToast("Ordine annullato.");
+            }
+        }
+
+        function aggiornaBadgeNavigazione() {
+            const totalePezzi = comandaPalmare.reduce((acc, curr) => acc + curr.quantita, 0);
+            const badge = document.getElementById('badge-totale-palmare');
+            badge.innerText = totalePezzi;
+            badge.style.display = totalePezzi > 0 ? 'inline-block' : 'none';
         }
 
         function aggiornaInterfacciaComandaPalmare() {
@@ -312,12 +391,12 @@
             
             let totale = comandaPalmare.reduce((acc, curr) => acc + (curr.prezzo * curr.quantita), 0);
             document.getElementById('totale-comanda-palmare').innerText = formattaEuro(totale);
-            document.getElementById('badge-totale-palmare').innerText = formattaEuro(totale);
+            aggiornaBadgeNavigazione();
             
             document.getElementById('btn-invia-cassa').disabled = comandaPalmare.length === 0;
 
             if(comandaPalmare.length === 0) {
-                corpo.innerHTML = `<div class="comanda-vuota-stato">🛒<br>Nessun prodotto selezionato nell'ordine attuale.</div>`;
+                corpo.innerHTML = `<div class="comanda-vuota-stato"><span style="font-size:2rem">🧾</span>Nessun prodotto selezionato nell'ordine attuale.</div>`;
                 return;
             }
 
@@ -327,7 +406,8 @@
                 li.innerHTML = `
                     <div class="item-riga-alta">
                         <div class="info-articolo-nome"><strong>${item.quantita}x</strong> ${item.nome}</div>
-                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <div style="display:flex; align-items:center;">
+                            <span class="item-prezzo">${formattaEuro(item.prezzo * item.quantita)}</span>
                             <div class="controlli-qta">
                                 <button class="btn-modifica" onclick="cambiaQuantitaItem(${idx}, -1)">-</button>
                                 <button class="btn-modifica" onclick="cambiaQuantitaItem(${idx}, 1)">+</button>
@@ -335,7 +415,7 @@
                         </div>
                     </div>
                     <div class="nota-variazione" onclick="apriModalNotaPalmare(${idx})">
-                        ${item.variazione ? `✏️ ${item.variazione}` : "+ Aggiungi Variante/Nota"}
+                        ${item.variazione ? `✏️ ${item.variazione}` : "➕ Aggiungi Variante/Nota"}
                     </div>
                 `;
                 corpo.appendChild(li);
@@ -357,7 +437,7 @@
             chiudiModalNotaPalmare();
         }
 
-        // --- GESTIONE INVIO DATI ALLA CASSA ---
+        // --- GESTIONE RETE E INVIO MQTT ---
         function connettiMqttRete() {
             const stanzaId = document.getElementById('chiave-rete-id').value.trim();
             const statusBox = document.getElementById('rete-status');
@@ -368,13 +448,12 @@
             statusBox.className = "stato-rete";
             statusTesto.innerText = "Connessione...";
 
-            // Connessione al broker MQTT pubblico su WebSockets
             clientMqtt = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
 
             clientMqtt.on('connect', () => {
                 statusBox.classList.add('online');
                 statusTesto.innerText = "Connesso";
-                showToast("Palmare pronto e connesso alla rete!");
+                showToast("Terminale online. Pronto all'uso!");
             });
 
             clientMqtt.on('error', () => {
@@ -384,7 +463,7 @@
         }
 
         function spedisciOrdineACassa() {
-            const tavolo = document.getElementById('num-tavolo-palmare').value.trim() || "SALA";
+            const tavolo = document.getElementById('num-tavolo-palmare').value.trim() || "BANCO";
             const stanzaId = document.getElementById('chiave-rete-id').value.trim();
 
             if(comandaPalmare.length === 0) return;
@@ -395,16 +474,21 @@
                 articoli: comandaPalmare
             };
 
-            // Spedisce l'ordine sul canale concordato della stanza
+            document.getElementById('btn-invia-cassa').innerText = "Inviando...";
+            document.getElementById('btn-invia-cassa').disabled = true;
+
             clientMqtt.publish(`smartcassa/comande/${stanzaId}`, JSON.stringify(pacchettoComanda), { qos: 1 }, (err) => {
+                document.getElementById('btn-invia-cassa').innerText = "📡 INVIA ALLA CASSA";
+                
                 if(!err) {
-                    showToast("Comanda inviata correttamente alla cassa!", "success");
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]); // Pattern vibrazione successo
+                    showToast("Comanda inviata alla cassa centrale!", "success");
                     comandaPalmare = [];
                     document.getElementById('num-tavolo-palmare').value = '';
                     switchSchermataMobile('menu');
-                    document.getElementById('badge-totale-palmare').innerText = "0,00 €";
                 } else {
-                    showToast("Errore di invio. Verifica l'Hotspot.", "error");
+                    showToast("Errore di rete. Riprova.", "error");
+                    document.getElementById('btn-invia-cassa').disabled = false;
                 }
             });
         }
@@ -421,6 +505,7 @@
         window.onload = () => {
             disegnaTabsFiltri();
             disegnaGrigliaProdotti();
+            aggiornaBadgeNavigazione();
             connettiMqttRete();
         };
     </script>
