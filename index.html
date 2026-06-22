@@ -234,42 +234,15 @@
     </div>
 
     <script>
-        const elencoCategorie = ["piadine", "panini", "piatti", "bevande", "caffetteria", "cocktail"];
+        // Ora sono "let" e vuoti all'inizio, verranno popolati interamente dalla rete!
+        let elencoCategorie = [];
+        let databaseMenu = [];
+        let configCategorie = {};
         
-        const databaseMenu = [
-            { id: 1, categoria: "piadine", nome: "Piadina Crudo e Fontina", prezzo: 6.50 },
-            { id: 2, categoria: "piadine", nome: "Piadina Cotto e Fontina", prezzo: 6.00 },
-            { id: 3, categoria: "piadine", nome: "Piadina Salame e Fontina", prezzo: 6.00 },
-            { id: 4, categoria: "piadine", nome: "Piadina Crudo", prezzo: 5.50 },
-            { id: 5, categoria: "piadine", nome: "Piadina Cotto", prezzo: 5.00 },
-            { id: 6, categoria: "piadine", nome: "Piadina Salame", prezzo: 5.00 },
-            { id: 7, categoria: "piadine", nome: "Piadina Salsiccia Cipolla e Peperoni", prezzo: 7.00 },
-            { id: 8, categoria: "piadine", nome: "Piadina Stracchino e Rucola", prezzo: 5.50 },
-            { id: 9, categoria: "piadine", nome: "Piadina Vuota", prezzo: 3.00 },
-            { id: 10, categoria: "panini", nome: "Hamburger Classico", prezzo: 7.50 },
-            { id: 11, categoria: "panini", nome: "Cheeseburger", prezzo: 8.00 },
-            { id: 12, categoria: "panini", nome: "Hot Dog", prezzo: 4.50 },
-            { id: 13, categoria: "piatti", nome: "Cotoletta e Patatine", prezzo: 9.00 },
-            { id: 14, categoria: "piatti", nome: "Porzione Patatine Fritte", prezzo: 4.00 },
-            { id: 15, categoria: "piatti", nome: "Insalatona sfiziosa", prezzo: 7.50 },
-            { id: 16, categoria: "bevande", nome: "Acqua Naturale 50cl", prezzo: 1.50 },
-            { id: 17, categoria: "bevande", nome: "Acqua Frizzante 50cl", prezzo: 1.50 },
-            { id: 18, categoria: "bevande", nome: "Coca Cola in lattina", prezzo: 2.50 },
-            { id: 19, categoria: "bevande", nome: "Fanta / Estathé", prezzo: 2.50 },
-            { id: 20, margin: 0, categoria: "bevande", nome: "Birra alla Spina 40cl", prezzo: 4.50 },
-            { id: 21, categoria: "bevande", nome: "Birra in Bottiglia", prezzo: 3.50 },
-            { id: 25, categoria: "caffetteria", nome: "Caffè Espresso", prezzo: 1.20 },
-            { id: 26, categoria: "caffetteria", nome: "Caffè Corretto", prezzo: 2.00 },
-            { id: 27, categoria: "caffetteria", nome: "Amaro del Capo", prezzo: 3.00 },
-            { id: 22, categoria: "cocktail", nome: "Aperol Spritz", prezzo: 5.00 },
-            { id: 23, categoria: "cocktail", nome: "Mojito", prezzo: 6.00 },
-            { id: 24, categoria: "cocktail", nome: "Gin Tonic", prezzo: 7.00 }
-        ];
-
         const emojiMappa = { 'piadine':'🥙', 'panini':'🍔', 'piatti':'🍝', 'bevande':'🥤', 'caffetteria':'☕', 'cocktail':'🍹' };
         
         let comandaPalmare = [];
-        let categoriaSelezionata = "piadine";
+        let categoriaSelezionata = "";
         let indexNotaAttiva = null;
         let clientMqtt = null;
         let termineRicerca = "";
@@ -315,11 +288,25 @@
             aggiornaBadgeNavigazione();
         }
 
+        // Recupera Emoji customizzata dalla cassa, oppure usa default
+        function ottieniEmojiCat(cat) {
+            if(configCategorie[cat] && configCategorie[cat].icon) return configCategorie[cat].icon;
+            return emojiMappa[cat.toLowerCase()] || '🍽️';
+        }
+
         function disegnaTabsFiltri() {
             const cont = document.getElementById('tabs-banco-palmare');
+            if (elencoCategorie.length === 0) {
+                cont.innerHTML = '<div style="padding:1rem; font-size:0.85rem; color:var(--text-muted)">In attesa di sincronizzazione con la cassa...</div>';
+                return;
+            }
+            
+            // Seleziona la prima categoria se non è impostata
+            if(!categoriaSelezionata && elencoCategorie.length > 0) categoriaSelezionata = elencoCategorie[0];
+
             cont.innerHTML = elencoCategorie.map(cat => `
                 <button class="tab-filtro ${categoriaSelezionata === cat ? 'active' : ''}" onclick="cambiaCategoria('${cat}')">
-                    ${emojiMappa[cat] || '🍽️'} ${cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    ${ottieniEmojiCat(cat)} ${cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </button>
             `).join('');
         }
@@ -360,7 +347,14 @@
         function disegnaGrigliaProdotti() {
             const grid = document.getElementById('griglia-prodotti-palmare');
             
+            if (databaseMenu.length === 0) {
+                grid.innerHTML = '<div style="padding:1rem; color:var(--text-light); text-align:center; width:100%; grid-column: 1 / -1;">Menu vuoto. Aspetta che la Cassa invii i dati.</div>';
+                return;
+            }
+
             const filtrati = databaseMenu.filter(p => {
+                // Non mostrare prodotti nascosti dalla cassa (se 'attivo' === false)
+                if (p.attivo === false) return false;
                 if (termineRicerca) return p.nome.toLowerCase().includes(termineRicerca);
                 return p.categoria === categoriaSelezionata;
             });
@@ -372,7 +366,7 @@
                 return `
                     <div class="card-prodotto" onclick="aggiungiProdotto(${p.id})">
                         ${badge}
-                        <span class="card-icon">${emojiMappa[p.categoria] || '🍽️'}</span>
+                        <span class="card-icon">${ottieniEmojiCat(p.categoria)}</span>
                         <div class="nome-prodotto">${p.nome}</div>
                         <div class="prezzo-prodotto">${formattaEuro(p.prezzo)}</div>
                     </div>
@@ -500,6 +494,31 @@
                 statusTesto.innerText = "Online";
                 showToast("Palmare accoppiato alla rete!");
                 document.getElementById('panel-impostazioni-rete').style.display = "none";
+
+                // CHIEDE ALLA CASSA IL MENU AGGIORNATO
+                clientMqtt.publish(`smartcassa/menu_request/${stanzaId}`, JSON.stringify({ azione: "richiesta" }), { qos: 1 });
+                // SI ISCRIVE PER RICEVERE IL MENU
+                clientMqtt.subscribe(`smartcassa/menu_sync/${stanzaId}`, { qos: 1 });
+            });
+
+            clientMqtt.on('message', (topic, message) => {
+                if (topic === `smartcassa/menu_sync/${stanzaId}`) {
+                    try {
+                        const pacchettoConfig = JSON.parse(message.toString());
+                        
+                        // Sincronizza i dati locali sovrascrivendoli
+                        if(pacchettoConfig.categorie) elencoCategorie = pacchettoConfig.categorie;
+                        if(pacchettoConfig.prodotti) databaseMenu = pacchettoConfig.prodotti;
+                        if(pacchettoConfig.configCategorie) configCategorie = pacchettoConfig.configCategorie;
+
+                        // Ridisegna l'interfaccia con i nuovi dati
+                        disegnaTabsFiltri();
+                        disegnaGrigliaProdotti();
+                        showToast("Menu Sincronizzato con la Cassa!");
+                    } catch(e) {
+                        console.error("Errore parsing menu remoto", e);
+                    }
+                }
             });
 
             clientMqtt.on('error', () => {
