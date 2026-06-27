@@ -236,7 +236,6 @@
     </div>
 
     <script>
-        // Ora sono "let" e vuoti all'inizio, verranno popolati interamente dalla rete!
         let elencoCategorie = [];
         let databaseMenu = [];
         let configCategorie = {};
@@ -290,7 +289,6 @@
             aggiornaBadgeNavigazione();
         }
 
-        // Recupera Emoji customizzata dalla cassa, oppure usa default
         function ottieniEmojiCat(cat) {
             if(configCategorie[cat] && configCategorie[cat].icon) return configCategorie[cat].icon;
             return emojiMappa[cat.toLowerCase()] || '🍽️';
@@ -303,7 +301,6 @@
                 return;
             }
             
-            // Seleziona la prima categoria se non è impostata
             if(!categoriaSelezionata && elencoCategorie.length > 0) categoriaSelezionata = elencoCategorie[0];
 
             cont.innerHTML = elencoCategorie.map(cat => `
@@ -355,7 +352,6 @@
             }
 
             const filtrati = databaseMenu.filter(p => {
-                // Non mostrare prodotti nascosti dalla cassa (se 'attivo' === false)
                 if (p.attivo === false) return false;
                 if (termineRicerca) return p.nome.toLowerCase().includes(termineRicerca);
                 return p.categoria === categoriaSelezionata;
@@ -497,9 +493,7 @@
                 showToast("Palmare accoppiato alla rete!");
                 document.getElementById('panel-impostazioni-rete').style.display = "none";
 
-                // CHIEDE ALLA CASSA IL MENU AGGIORNATO
                 clientMqtt.publish(`smartcassa/menu_request/${stanzaId}`, JSON.stringify({ azione: "richiesta" }), { qos: 1 });
-                // SI ISCRIVE PER RICEVERE IL MENU
                 clientMqtt.subscribe(`smartcassa/menu_sync/${stanzaId}`, { qos: 1 });
             });
 
@@ -508,15 +502,21 @@
                     try {
                         const pacchettoConfig = JSON.parse(message.toString());
                         
-                        // Sincronizza i dati locali sovrascrivendoli
+                        // Confronto dello stato precedente per evitare falsi toast
+                        const vecchioMenuString = JSON.stringify(databaseMenu);
+                        const nuovoMenuString = JSON.stringify(pacchettoConfig.prodotti || []);
+
                         if(pacchettoConfig.categorie) elencoCategorie = pacchettoConfig.categorie;
                         if(pacchettoConfig.prodotti) databaseMenu = pacchettoConfig.prodotti;
                         if(pacchettoConfig.configCategorie) configCategorie = pacchettoConfig.configCategorie;
 
-                        // Ridisegna l'interfaccia con i nuovi dati
                         disegnaTabsFiltri();
                         disegnaGrigliaProdotti();
-                        showToast("Menu Sincronizzato con la Cassa!");
+
+                        // MOSTRA IL TOAST SOLO SE IL MENU È EFFETTIVAMENTE DIVERSO
+                        if (vecchioMenuString !== nuovoMenuString && vecchioMenuString !== "[]") {
+                            showToast("Menu Sincronizzato con la Cassa!");
+                        }
                     } catch(e) {
                         console.error("Errore parsing menu remoto", e);
                     }
@@ -552,11 +552,9 @@
                     if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
                     showToast("Comanda inviata alla cassa!", "success");
                     
-                    // AZZERAMENTO COMPLETO
                     comandaPalmare = [];
                     document.getElementById('num-tavolo-palmare').value = '';
                     
-                    // Sincronizza subito i badge ed esce
                     aggiornaBadgeNavigazione();
                     switchSchermataMobile('menu');
                 } else {
@@ -576,7 +574,6 @@
         }
 
         window.onload = () => {
-            // Recupera l'ultimo hotspot salvato
             const localStanza = localStorage.getItem('smartcassa_hotspot_id');
             if(localStanza) {
                 document.getElementById('chiave-rete-id').value = localStanza;
