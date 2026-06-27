@@ -4,16 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SmartCassa Pro - Terminale Palmare</title>
+    
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4357/4357325.png?v=2">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn-icons-png.flaticon.com/512/4357/4357325.png?v=2">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/4357/4357325.png?v=2">
+    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/4357/4357325.png?v=2">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/4357/4357325.png?v=2">
+    
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     
     <style>
@@ -71,7 +78,6 @@
         .stato-rete.online { background: var(--success-dim); color: var(--success); }
         .stato-rete .pallino { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
-        /* Pannello configurazione a Scomparsa */
         .config-panel-hidden { display: none; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem 1rem; flex-direction: column; gap: 0.4rem; animation: slideDown 0.2s ease-out; }
         .config-panel-hidden label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
         .config-panel-hidden input { width: 100%; padding: 0.5rem; font-size: 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--input-bg); color: var(--text-main); font-weight: 600; text-align: center; }
@@ -82,19 +88,16 @@
         .input-tavolo { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 16px; font-weight: 700; background: var(--input-bg); color: var(--text-main); text-align: center; text-transform: uppercase; }
         .input-tavolo:focus { outline: none; border-color: var(--primary); }
         
-        /* Contenitore barra di ricerca con bottone cancella */
         .search-container { position: relative; width: 100%; display: flex; align-items: center; }
         .search-bar { width: 100%; padding: 0.6rem 2rem 0.6rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem; background: var(--bg-main); color: var(--text-main); }
         .search-bar:focus { outline: none; border-color: var(--primary); }
         .btn-clear-search { position: absolute; right: 10px; background: transparent; border: none; color: var(--text-light); font-size: 1rem; cursor: pointer; display: none; padding: 2px; }
 
-        /* Filtri Categorie */
         .barra-filtri-banco { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.6rem 1rem; background: var(--bg-main); border-bottom: 1px solid var(--border); white-space: nowrap; }
         .barra-filtri-banco::-webkit-scrollbar { display: none; }
         .tab-filtro { padding: 0.5rem 0.9rem; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700; color: var(--text-muted); cursor: pointer; display: inline-block; transition: all 0.2s; }
         .tab-filtro.active { background: var(--text-main); color: var(--surface); border-color: var(--text-main); }
 
-        /* Prodotti */
         .grid-prodotti { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.6rem; padding: 1rem; }
         .card-prodotto { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.8rem; display: flex; flex-direction: column; justify-content: space-between; background: var(--surface); min-height: 95px; position: relative; user-select: none; transition: transform 0.1s, box-shadow 0.1s; }
         .card-prodotto:active { transform: scale(0.95); background: var(--input-bg); }
@@ -102,11 +105,9 @@
         .nome-prodotto { font-weight: 700; font-size: 0.82rem; line-height: 1.25; color: var(--text-main); }
         .prezzo-prodotto { font-weight: 800; font-size: 0.9rem; color: var(--text-main); text-align: right; margin-top: auto; padding-top: 5px; }
         
-        /* Badge Quantità Card */
         .badge-qta { position: absolute; top: -6px; right: -6px; background: var(--primary); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: pop 0.2s ease-out; }
         @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
-        /* Vista Comanda */
         .comanda-screen { display: none; padding: 1rem; flex-direction: column; flex: 1; background: var(--surface); }
         .comanda-screen.active { display: flex; }
         .header-comanda { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border); }
@@ -135,12 +136,10 @@
         .btn-invia-comanda:active:not(:disabled) { transform: translateY(2px); }
         .btn-invia-comanda:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Bottom Bar Navigazione */
         .mobile-cassa-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--border); z-index: 101; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); display: flex; transition: background-color 0.3s; }
         .mobile-sub-btn { flex: 1; padding: 1rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: color 0.2s, background-color 0.2s; }
         .mobile-sub-btn.active { color: var(--primary); border-top: 3px solid var(--primary); }
 
-        /* Modale */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
         .modal-box { background: var(--surface); padding: 1.25rem; border-radius: var(--radius-lg); width: 90%; max-width: 340px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -182,7 +181,6 @@
     </div>
 
     <div class="main-layout">
-        
         <div id="view-prodotti-container">
             <div class="top-inputs">
                 <input type="text" id="num-tavolo-palmare" class="input-tavolo" placeholder="TAVOLO / NOME" autocomplete="off">
@@ -193,7 +191,6 @@
             </div>
 
             <div class="barra-filtri-banco" id="tabs-banco-palmare"></div>
-
             <div class="grid-prodotti" id="griglia-prodotti-palmare"></div>
         </div>
 
@@ -214,7 +211,6 @@
                 📡 INVIA ALLA CASSA
             </button>
         </div>
-
     </div>
 
     <div class="mobile-cassa-bar">
@@ -472,7 +468,6 @@
             chiudiModalNotaPalmare();
         }
 
-        // --- RETE WIRELESS HOTSPOT ---
         function salvaEConnettiReteMqtt() {
             const stanzaId = document.getElementById('chiave-rete-id').value.trim() || "Cassa_MioHotspot";
             localStorage.setItem('smartcassa_hotspot_id', stanzaId);
@@ -502,7 +497,6 @@
                     try {
                         const pacchettoConfig = JSON.parse(message.toString());
                         
-                        // Confronto dello stato precedente per evitare falsi toast
                         const vecchioMenuString = JSON.stringify(databaseMenu);
                         const nuovoMenuString = JSON.stringify(pacchettoConfig.prodotti || []);
 
@@ -513,7 +507,7 @@
                         disegnaTabsFiltri();
                         disegnaGrigliaProdotti();
 
-                        // MOSTRA IL TOAST SOLO SE IL MENU È EFFETTIVAMENTE DIVERSO
+                        // OPZIONE 1 INTEGRATA: Mostra il toast solo se il menu è cambiato per davvero
                         if (vecchioMenuString !== nuovoMenuString && vecchioMenuString !== "[]") {
                             showToast("Menu Sincronizzato con la Cassa!");
                         }
